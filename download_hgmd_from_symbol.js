@@ -56,32 +56,32 @@ const save_to_file = async (params, file) => {
 
 // 下载基因变异
 const download_gene_mutations = async (gene) => {
-  const body = `gene=${gene}&sorted=location&database=Get+all+mutations`;
+  const params = `gene=${gene}&sorted=location&database=Get+all+mutations`;
   const file = `${gene}.html`;
-  const err = await save_to_file(body, file);
+  const err = await save_to_file(params, file);
   return err;
 };
 
 // 下载基因总结
 const download_gene_summary = async (gene) => {
-  const body = `gene=${gene}&sorted=location&database=Gene+summary`;
+  const params = `gene=${gene}&sorted=location&database=Gene+summary`;
   const file = `${gene}.html`;
-  const err = await save_to_file(body, file);
+  const err = await save_to_file(params, file);
   return err;
 };
 
-const run_summary = async (symbols) => {
+const run_common = async (fn, symbols) => {
   const start = performance.now();
-
   const faileds = [];
+
   for (const symbol of symbols) {
-    const err = await retry(download_gene_summary, symbol, 3);
+    const err = await retry(fn, symbol, 3);
     if (err) {
       faileds.push(symbol);
     }
   }
-  const end = performance.now();
 
+  const end = performance.now();
   console.log(
     `下载${symbols.length}个基因总结耗时${Math.ceil((end - start) / 1000)}秒。`
   );
@@ -90,41 +90,27 @@ const run_summary = async (symbols) => {
 };
 
 const run_mutations = async (symbols) => {
-  const start = performance.now();
-
-  const faileds = [];
-
-  for (const symbol of symbols) {
-    const err = await retry(download_gene_mutations, symbol, 3);
-    if (err) {
-      faileds.push(symbol);
-    }
+  const arr = await run_common(download_gene_mutations, symbols);
+  if (arr.length) {
+    console.log(arr);
+  } else {
+    console.log("works all done!");
   }
+};
 
-  const end = performance.now();
-  console.log(
-    `下载${symbols.length}个基因总结耗时${Math.ceil((end - start) / 1000)}秒。`
-  );
-
-  return faileds;
+const run_summary = async (symbols) => {
+  const arr = await run_common(download_gene_summary, symbols);
+  if (arr.length) {
+    console.log(arr);
+  } else {
+    console.log("works all done!");
+  }
 };
 
 /******************执行段******************/
 
 const symbols = [];
 
-run_mutations(symbols).then((arr) => {
-  if (arr.length) {
-    console.log(arr);
-  } else {
-    console.log("works all done!");
-  }
-});
+run_mutations(symbols);
 
-run_summary(symbols).then((arr) => {
-  if (arr.length) {
-    console.log(arr);
-  } else {
-    console.log("works all done!");
-  }
-});
+run_summary(symbols);
