@@ -1,6 +1,6 @@
 // 请求函数
 //host: https://my.qiagendigitalinsights.com/
-const request = async (body) => {
+const 请求 = async (body) => {
   const url = "/bbp/view/hgmd/pro/all.php";
   try {
     const resp = await fetch(url, {
@@ -20,11 +20,11 @@ const request = async (body) => {
 
 // 保存到文件
 const save_to_file = async (params, file) => {
-  const [blob, err] = await request(params);
+  const [blob, err] = await 请求(params);
 
   if (blob) {
     // 创建Blob对象URL
-    const url = URL.createObjectURL(blob);
+    const url = 网站.createObjectURL(blob);
 
     // 保存文件
     const a = document.createElement("a");
@@ -36,7 +36,7 @@ const save_to_file = async (params, file) => {
     document.body.removeChild(a);
 
     // 释放内存
-    URL.revokeObjectURL(url);
+    网站.revokeObjectURL(url);
   }
   return err;
 };
@@ -44,7 +44,7 @@ const save_to_file = async (params, file) => {
 // 下载基因变异
 const download_gene_mutations = async (gene) => {
   const params = `gene=${gene}&sorted=location&database=Get+all+mutations`;
-  const file = `${gene}.mutaiton.html`;
+  const file = `${gene}.mutation.html`;
   const err = await save_to_file(params, file);
   return err;
 };
